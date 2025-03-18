@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Clippy</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f7;
+      color: #333;
+      overflow: hidden;
+    }
+    
+    #app {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .header {
+      background-color: #007aff;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      -webkit-app-region: drag;
+    }
+    
+    .header h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .header-actions {
+      -webkit-app-region: no-drag;
+    }
+    
+    .header-actions button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 5px 10px;
+      border-radius: 4px;
+    }
+    
+    .header-actions button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .search-bar {
+      padding: 10px;
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .search-bar input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+      outline: none;
+      box-sizing: border-box;
+    }
+    
+    .search-bar input:focus {
+      border-color: #007aff;
+    }
+    
+    .clipboard-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    
+    .clipboard-item {
+      padding: 10px 15px;
+      border-bottom: 1px solid #eee;
+      background-color: #fff;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .clipboard-item:hover {
+      background-color: #f0f0f0;
+    }
+    
+    .clipboard-text {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 14px;
+    }
+    
+    .clipboard-actions {
+      display: flex;
+      gap: 5px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .clipboard-item:hover .clipboard-actions {
+      opacity: 1;
+    }
+    
+    .clipboard-actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #666;
+      padding: 5px;
+      border-radius: 4px;
+    }
+    
+    .clipboard-actions button:hover {
+      background-color: #eee;
+      color: #333;
+    }
+    
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #999;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .empty-state p {
+      margin: 10px 0;
+    }
+    
+    .timestamp {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .footer {
+      padding: 8px;
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+      background-color: #f5f5f7;
+      border-top: 1px solid #ddd;
+    }
+    
+    .footer a {
+      color: #007aff;
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="header">
+      <h1>Clippy</h1>
+      <div class="header-actions">
+        <button id="clear-all-btn">Clear All</button>
+      </div>
+    </div>
+    
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search clipboard history...">
+    </div>
+    
+    <ul id="clipboard-list" class="clipboard-list"></ul>
+    
+    <div id="empty-state" class="empty-state" style="display: none;">
+      <p>No clipboard history found</p>
+      <p>Copy text to see it appear here</p>
+    </div>
+
+    <div class="footer">
+      Created by <a href="#" id="github-link">Mohit Gupta</a> | v1.0.0 | © 2025
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer, shell } = require('electron');
+    
+    let clipboardItems = [];
+    const clipboardListEl = document.getElementById('clipboard-list');
+    const emptyStateEl = document.getElementById('empty-state');
+    const searchInputEl = document.getElementById('search-input');
+    const clearAllBtn = document.getElementById('clear-all-btn');
+    const githubLink = document.getElementById('github-link');
+    
+    // Open GitHub link
+    githubLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      shell.openExternal('https://github.com/mohitgupta07');
+    });
+    
+    // Format timestamp
+    function formatTimestamp(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    // Render the clipboard list
+    function renderClipboardList(items) {
+      if (items.length === 0) {
+        clipboardListEl.style.display = 'none';
+        emptyStateEl.style.display = 'flex';
+        return;
+      }
+      
+      clipboardListEl.style.display = 'block';
+      emptyStateEl.style.display = 'none';
+      
+      clipboardListEl.innerHTML = '';
+      
+      items.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'clipboard-item';
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.addEventListener('click', () => handlePaste(item.text));
+        
+        const textDiv = document.createElement('div');
+        textDiv.className = 'clipboard-text';
+        textDiv.textContent = item.text;
+        
+        const timestampDiv = document.createElement('div');
+        timestampDiv.className = 'timestamp';
+        timestampDiv.textContent = formatTimestamp(item.timestamp);
+        
+        contentDiv.appendChild(textDiv);
+        contentDiv.appendChild(timestampDiv);
+        
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'clipboard-actions';
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          handleDelete(item.id);
+        });
+        
+        actionsDiv.appendChild(deleteBtn);
+        
+        li.appendChild(contentDiv);
+        li.appendChild(actionsDiv);
+        
+        clipboardListEl.appendChild(li);
+      });
+    }
+    
+    // Filter items based on search term
+    function filterItems() {
+      const searchTerm = searchInputEl.value.toLowerCase();
+      const filteredItems = clipboardItems.filter(item => 
+        item.text.toLowerCase().includes(searchTerm)
+      );
+      renderClipboardList(filteredItems);
+    }
+    
+    // Paste item
+    function handlePaste(text) {
+      ipcRenderer.send('paste-item', text);
+    }
+    
+    // Delete item
+    function handleDelete(id) {
+      ipcRenderer.send('delete-item', id);
+    }
+    
+    // Clear all items
+    function handleClearAll() {
+      ipcRenderer.send('clear-history');
+    }
+    
+    // Request clipboard history when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      ipcRenderer.send('get-clipboard-history');
+    });
+    
+    // Listen for clipboard history updates
+    ipcRenderer.on('clipboard-history-updated', (_, items) => {
+      clipboardItems = items;
+      filterItems();
+    });
+    
+    // Listen for search input changes
+    searchInputEl.addEventListener('input', filterItems);
+    
+    // Listen for clear all button clicks
+    clearAllBtn.addEventListener('click', handleClearAll);
+  </script>
+</body>
+</html> 
