@@ -155,10 +155,13 @@ function toggleWindow(bounds) {
       mainWindow.setAlwaysOnTop(true, 'floating', 1);
     }
     
-    // Show without activating to prevent stealing focus
-    mainWindow.showInactive();
+    // First show the window
+    mainWindow.show();
     
-    // Send message to renderer to focus the search input
+    // Then immediately focus it for keyboard interaction
+    mainWindow.focus();
+    
+    // Send message to renderer to focus the search input - crucial for keyboard navigation
     mainWindow.webContents.send('focus-search');
     
     // Log that we're showing the window to help with debugging
@@ -286,14 +289,16 @@ function registerShortcuts() {
             // Set position
             mainWindow.setPosition(x, y);
             
-            // Show it, but don't steal focus
-            mainWindow.showInactive();
+            // Show and focus - critical change for keyboard interaction
+            mainWindow.show();
+            mainWindow.focus();
             
             // Re-assert window settings after display
             setTimeout(() => {
               if (mainWindow) {
                 mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
                 mainWindow.setAlwaysOnTop(true, 'pop-up-menu', 1);
+                mainWindow.focus(); // Re-focus to ensure keyboard interaction works
               }
             }, 50);
             
@@ -450,6 +455,14 @@ app.on('will-quit', () => {
 // IPC handlers
 ipcMain.on('get-clipboard-history', (event) => {
   event.reply('clipboard-history-updated', clipboardHistory);
+  
+  // After sending the history, ensure the window has focus and relay that to the renderer
+  if (mainWindow) {
+    mainWindow.focus();
+    setTimeout(() => {
+      mainWindow.webContents.send('focus-search');
+    }, 100); // Short delay to ensure the DOM is ready
+  }
 });
 
 ipcMain.on('paste-item', (event, text) => {

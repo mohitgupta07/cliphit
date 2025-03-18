@@ -539,7 +539,19 @@
     
     // Focus the search input when window is shown
     ipcRenderer.on('focus-search', () => {
-      searchInputEl.focus();
+      // When the focus-search event is received, this is crucial for keyboard nav
+      setTimeout(() => {
+        // First focus the window itself if needed
+        window.focus();
+        
+        // Set initial selection to first item
+        if (clipboardItems.length > 0) {
+          selectItem(0);
+        }
+        
+        // Then focus the search input
+        searchInputEl.focus();
+      }, 50);
     });
     
     // Show help overlay when requested
@@ -559,80 +571,83 @@
     
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-      // Toggle help overlay with '?'
-      if (e.key === '?' || (e.key === '/' && e.shiftKey)) {
-        toggleHelpOverlay();
+      // Navigate up
+      if (e.key === 'ArrowUp') {
         e.preventDefault();
-        return;
+        if (selectedIndex > 0) {
+          selectItem(selectedIndex - 1);
+        }
       }
       
-      // If help overlay is open, only listen for Escape
-      if (helpOverlay.classList.contains('show')) {
-        if (e.key === 'Escape') {
+      // Navigate down
+      else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const items = clipboardListEl.querySelectorAll('.clipboard-item');
+        if (selectedIndex < items.length - 1) {
+          selectItem(selectedIndex + 1);
+        }
+      }
+      
+      // Paste selected item with Enter
+      else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (selectedIndex >= 0) {
+          const items = clipboardListEl.querySelectorAll('.clipboard-item');
+          if (items[selectedIndex]) {
+            const index = parseInt(items[selectedIndex].dataset.index, 10);
+            if (!isNaN(index) && clipboardItems[index]) {
+              handlePaste(clipboardItems[index].text);
+            }
+          }
+        }
+      }
+      
+      // Close with Escape
+      else if (e.key === 'Escape') {
+        e.preventDefault();
+        // If help overlay is visible, close it
+        if (helpOverlay.classList.contains('show')) {
           toggleHelpOverlay();
-        }
-        return;
-      }
-      
-      // Close on escape
-      if (e.key === 'Escape') {
-        ipcRenderer.send('hide-window');
-        return;
-      }
-      
-      // Arrow key navigation
-      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        
-        const items = clipboardListEl.querySelectorAll('.clipboard-item');
-        if (items.length === 0) return;
-        
-        let newIndex = selectedIndex;
-        
-        if (e.key === 'ArrowDown') {
-          newIndex = selectedIndex < items.length - 1 ? selectedIndex + 1 : 0;
         } else {
-          newIndex = selectedIndex > 0 ? selectedIndex - 1 : items.length - 1;
+          // Otherwise hide the window
+          ipcRenderer.send('hide-window');
         }
-        
-        selectItem(newIndex);
       }
       
-      // Enter to paste selected item
-      if (e.key === 'Enter') {
-        const items = clipboardListEl.querySelectorAll('.clipboard-item');
-        if (selectedIndex >= 0 && selectedIndex < items.length) {
-          const index = parseInt(items[selectedIndex].dataset.index);
-          if (clipboardItems[index]) {
-            handlePaste(clipboardItems[index].text);
+      // Delete selected item with Delete key
+      else if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (document.activeElement !== searchInputEl && selectedIndex >= 0) {
+          e.preventDefault();
+          const items = clipboardListEl.querySelectorAll('.clipboard-item');
+          if (items[selectedIndex]) {
+            const index = parseInt(items[selectedIndex].dataset.index, 10);
+            if (!isNaN(index) && clipboardItems[index]) {
+              handleDelete(clipboardItems[index].id);
+            }
           }
         }
       }
       
-      // Delete to remove selected item
-      if (e.key === 'Delete' || e.key === 'Backspace') {
-        const items = clipboardListEl.querySelectorAll('.clipboard-item');
-        if (selectedIndex >= 0 && selectedIndex < items.length && document.activeElement !== searchInputEl) {
-          const index = parseInt(items[selectedIndex].dataset.index);
-          if (clipboardItems[index]) {
-            handleDelete(clipboardItems[index].id);
-            e.preventDefault();
-          }
+      // Quick selection with Cmd+1 through Cmd+9
+      else if (e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey && 
+               e.key >= '1' && e.key <= '9') {
+        e.preventDefault();
+        const index = parseInt(e.key) - 1;
+        if (index < clipboardItems.length) {
+          handlePaste(clipboardItems[index].text);
         }
       }
       
-      // Cmd+A to clear all
-      if (e.key === 'a' && e.metaKey && document.activeElement !== searchInputEl) {
+      // Clear all with Cmd+A
+      else if (e.metaKey && e.key === 'a' && document.activeElement !== searchInputEl) {
         e.preventDefault();
         handleClearAll();
       }
       
-      // Number keys for quick paste (1-9)
-      if (e.metaKey && e.key >= '1' && e.key <= '9') {
-        const index = parseInt(e.key) - 1;
-        if (clipboardItems[index]) {
-          handlePaste(clipboardItems[index].text);
-        }
+      // Show help with ? key
+      else if (e.key === '?' || (e.metaKey && e.key === '/')) {
+        e.preventDefault();
+        toggleHelpOverlay();
       }
     });
   </script>
