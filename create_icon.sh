@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script creates a simple icon for the Clippy app
+# This script creates a simple icon for the ClipHit app
 # In a real project, you would replace this with a proper icon
 
 echo "Creating icon files..."

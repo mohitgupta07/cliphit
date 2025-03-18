@@ -1,13 +1,13 @@
 {
-  "name": "clippy",
-  "productName": "Clippy",
+  "name": "cliphit",
+  "productName": "ClipHit",
   "version": "1.0.0",
   "description": "A clipboard history manager for macOS",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "package": "electron-packager . Clippy --platform=darwin --arch=x64 --out=dist --icon=assets/icon.icns --overwrite",
-    "create-archive": "git archive --format=tar.gz --prefix=clippy-${npm_package_version}/ -o clippy-${npm_package_version}.tar.gz v${npm_package_version}",
+    "package": "electron-packager . ClipHit --platform=darwin --arch=x64 --out=dist --icon=assets/icon.icns --overwrite",
+    "create-archive": "git archive --format=tar.gz --prefix=cliphit-${npm_package_version}/ -o cliphit-${npm_package_version}.tar.gz v${npm_package_version}",
     "generate-hash": "./scripts/generate-hash.sh",
     "prepare-release": "npm run create-archive && npm run generate-hash",
     "update-version": "./scripts/update-version.sh",
@@ -25,7 +25,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mohitgupta07/clippy.git"
+    "url": "https://github.com/mohitgupta07/cliphit.git"
   },
   "keywords": [
     "clipboard",

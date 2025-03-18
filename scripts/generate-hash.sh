@@ -7,8 +7,8 @@ set -e
 
 # Extract version from package.json
 VERSION=$(node -p "require('../package.json').version")
-ARCHIVE_NAME="clippy-${VERSION}.tar.gz"
-FORMULA_FILE="clippy.rb"
+ARCHIVE_NAME="cliphit-${VERSION}.tar.gz"
+FORMULA_FILE="cliphit.rb"
 
 echo "Using version: ${VERSION}"
 

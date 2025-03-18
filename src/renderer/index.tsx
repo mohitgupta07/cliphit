@@ -51,7 +51,7 @@ const App: React.FC = () => {
   return (
     <div id="app">
       <div className="header">
-        <h1>Clippy</h1>
+        <h1>ClipHit</h1>
         <div className="header-actions">
           <button onClick={handleClearHistory}>Clear All</button>
         </div>

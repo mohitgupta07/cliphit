@@ -30,10 +30,10 @@ echo "Updating index.html..."
 sed -i '' "s/| v[0-9]\+\.[0-9]\+\.[0-9]\+/| v${NEW_VERSION}/g" src/index.html
 
 # Update Homebrew formula
-echo "Updating clippy.rb..."
-OLD_VERSION=$(grep -o 'refs/tags/v[0-9]\+\.[0-9]\+\.[0-9]\+' clippy.rb | cut -d'v' -f2)
-sed -i '' "s/refs\/tags\/v${OLD_VERSION}/refs\/tags\/v${NEW_VERSION}/g" clippy.rb
-sed -i '' "s/clippy-${OLD_VERSION}.tar.gz/clippy-${NEW_VERSION}.tar.gz/g" clippy.rb
+echo "Updating cliphit.rb..."
+OLD_VERSION=$(grep -o 'refs/tags/v[0-9]\+\.[0-9]\+\.[0-9]\+' cliphit.rb | cut -d'v' -f2)
+sed -i '' "s/refs\/tags\/v${OLD_VERSION}/refs\/tags\/v${NEW_VERSION}/g" cliphit.rb
+sed -i '' "s/cliphit-${OLD_VERSION}.tar.gz/cliphit-${NEW_VERSION}.tar.gz/g" cliphit.rb
 
 echo ""
 echo "✅ Version updated to $NEW_VERSION across all files"

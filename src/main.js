@@ -71,7 +71,7 @@ function createWindow() {
 function createTray() {
   const iconPath = path.join(__dirname, '../assets/trayIconTemplate.png');
   tray = new Tray(nativeImage.createFromPath(iconPath));
-  tray.setToolTip('Clippy - Clipboard Manager');
+  tray.setToolTip('ClipHit - Clipboard Manager');
 
   tray.on('click', (event, bounds) => {
     toggleWindow(bounds);
@@ -79,7 +79,7 @@ function createTray() {
 
   tray.on('right-click', () => {
     const contextMenu = Menu.buildFromTemplate([
-      { label: 'Open Clippy', click: () => toggleWindow() },
+      { label: 'Open ClipHit', click: () => toggleWindow() },
       { type: 'separator' },
       { label: 'Keyboard Shortcuts', click: () => {
         if (mainWindow) {
@@ -165,7 +165,7 @@ function toggleWindow(bounds) {
     mainWindow.webContents.send('focus-search');
     
     // Log that we're showing the window to help with debugging
-    console.log('Showing Clippy window at position:', { x, y, display: currentDisplay.id });
+    console.log('Showing ClipHit window at position:', { x, y, display: currentDisplay.id });
   }
 }
 
@@ -347,10 +347,10 @@ app.on('ready', () => {
       const { Menu } = require('electron');
       const template = [
         {
-          label: 'Clippy',
+          label: 'ClipHit',
           submenu: [
             {
-              label: 'Toggle Clippy',
+              label: 'Toggle ClipHit',
               accelerator: 'Command+Shift+V',
               click: () => {
                 if (mainWindow && mainWindow.isVisible()) {
@@ -398,8 +398,8 @@ app.on('ready', () => {
         const { Notification } = require('electron');
         if (Notification.isSupported()) {
           const notification = new Notification({
-            title: 'Clippy Is Running',
-            body: 'Press Command+Shift+V or click the tray icon to open Clippy from any window.',
+            title: 'ClipHit Is Running',
+            body: 'Press Command+Shift+V or click the tray icon to open ClipHit from any window.',
             silent: false
           });
           

@@ -70,7 +70,7 @@ function createWindow() {
 function createTray() {
   const iconPath = path.join(__dirname, '../../assets/trayIconTemplate.png');
   tray = new Tray(nativeImage.createFromPath(iconPath));
-  tray.setToolTip('Clippy - Clipboard Manager');
+  tray.setToolTip('ClipHit - Clipboard Manager');
 
   tray.on('click', (event, bounds) => {
     toggleWindow(bounds);
@@ -78,7 +78,7 @@ function createTray() {
 
   tray.on('right-click', () => {
     const contextMenu = Menu.buildFromTemplate([
-      { label: 'Open Clippy', click: () => toggleWindow() },
+      { label: 'Open ClipHit', click: () => toggleWindow() },
       { type: 'separator' },
       { label: 'Clear History', click: clearHistory },
       { type: 'separator' },

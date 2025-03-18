@@ -1,7 +1,7 @@
-class Clippy < Formula
+class ClipHit < Formula
   desc "A clipboard history manager for macOS"
-  homepage "https://github.com/yourusername/clippy"
-  url "https://github.com/yourusername/clippy/releases/download/v1.0.0/clippy-1.0.0.tar.gz"
+  homepage "https://github.com/yourusername/cliphit"
+  url "https://github.com/yourusername/cliphit/releases/download/v1.0.0/cliphit-1.0.0.tar.gz"
   sha256 "YOUR_SHA256_HASH_WILL_GO_HERE_AFTER_BUILDING"
   license "MIT"
 
@@ -12,20 +12,20 @@ class Clippy < Formula
     bin.install_symlink Dir["#{libexec}/bin/*"]
     
     # Move the app to the Applications directory
-    prefix.install "Clippy.app"
+    prefix.install "ClipHit.app"
   end
 
   def caveats
     <<~EOS
-      Clippy.app was installed to:
+      ClipHit.app was installed to:
         #{prefix}
 
       To link the app to your Applications folder, run:
-        ln -sf "#{prefix}/Clippy.app" "/Applications/Clippy.app"
+        ln -sf "#{prefix}/ClipHit.app" "/Applications/ClipHit.app"
     EOS
   end
 
   test do
-    assert_predicate "#{prefix}/Clippy.app", :exist?
+    assert_predicate "#{prefix}/ClipHit.app", :exist?
   end
 end 
