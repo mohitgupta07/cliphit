@@ -4,7 +4,7 @@ class Cliphit < Formula
   url "https://github.com/mohitgupta07/cliphit/archive/refs/tags/v1.0.1.tar.gz"
   # The SHA256 hash should be generated when creating a release
   # To generate: `shasum -a 256 cliphit-1.0.1.tar.gz`
-  sha256 "4aeddcac49f33a81ddf036357f58995c6c1d224a1054251d4d505a728c218801" # Will be replaced during release process
+  sha256 "134115aee724fb14b9ae676bb36fdd2a6f26e9989af30a58265b0ed0f2f1c55e" # Will be replaced during release process
   license "MIT"
 
   depends_on "node"

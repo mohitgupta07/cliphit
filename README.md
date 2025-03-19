@@ -159,21 +159,24 @@ yarn release X.Y.Z
 
 This single command will:
 1. Update version numbers across all files
-2. Create a git tag
-3. Generate the release archive
+2. Create a git tag and push it to GitHub
+3. Download the release archive from GitHub
 4. Update the SHA256 hash in the Homebrew formula
-5. Commit and push all changes
+5. Commit and push formula changes
+
+This two-phase approach ensures the SHA256 in the formula is always accurate.
 
 ### Option 2: Manual Release Process
 
 If you prefer more control, you can follow these manual steps:
 
-1. Update the version number in `package.json`
-2. Create a git tag: `git tag vX.Y.Z`
-3. Prepare the release: `yarn prepare-release`
-4. The script will automatically create a release archive and update the SHA256 hash in the formula
-
-Note: The process will automatically create a release archive, generate the SHA256 hash, and update the Homebrew formula with the correct hash.
+1. Update the version in `package.json`
+2. Commit the change: `git commit -am "Bump version to vX.Y.Z"`
+3. Create and push a git tag: `git tag vX.Y.Z && git push origin vX.Y.Z`
+4. Download the release archive: `make download-archive`
+5. Update the formula: `make update-formula`
+6. Commit formula changes: `git commit -am "Update formula for vX.Y.Z"`
+7. Push changes: `git push origin main`
 
 ## Contributing
 

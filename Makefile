@@ -26,19 +26,17 @@ package:
 	@echo "🔨 Building and packaging application..."
 	yarn package
 
-# Create release archive
-archive: ensure-releases-dir
-	@echo "📁 Creating release archive for version $(VERSION)..."
-	@if git rev-parse "v$(VERSION)" >/dev/null 2>&1; then \
-		echo "Using git tag v$(VERSION) for archive creation..."; \
-		git archive --format=tar.gz --prefix=cliphit-$(VERSION)/ -o $(RELEASES_DIR)/cliphit-$(VERSION).tar.gz "v$(VERSION)"; \
-	else \
-		echo "Git tag v$(VERSION) not found. Creating archive from current HEAD..."; \
-		git archive --format=tar.gz --prefix=cliphit-$(VERSION)/ -o $(RELEASES_DIR)/cliphit-$(VERSION).tar.gz HEAD; \
-	fi
-	@echo "🔑 Generating SHA256 hash..."
+# Download release archive from GitHub
+download-archive: ensure-releases-dir
+	@echo "📁 Downloading release archive for version $(VERSION)..."
+	curl -L "https://github.com/mohitgupta07/cliphit/archive/refs/tags/v$(VERSION).tar.gz" -o $(RELEASES_DIR)/cliphit-$(VERSION).tar.gz
+	@echo "✅ Archive downloaded to $(RELEASES_DIR)/cliphit-$(VERSION).tar.gz"
+
+# Update formula with correct SHA256
+update-formula: download-archive
+	@echo "🔑 Generating SHA256 hash and updating formula..."
 	ARCHIVE_PATH="$(RELEASES_DIR)" ./scripts/generate-hash.sh
-	@echo "✅ Archive $(RELEASES_DIR)/cliphit-$(VERSION).tar.gz created and hash updated in formula"
+	@echo "✅ Formula updated with hash from downloaded archive"
 
 # Create a new release with specified version
 release:
@@ -67,7 +65,8 @@ help:
 	@echo "make              - Install dependencies and package the app"
 	@echo "make install      - Install dependencies"
 	@echo "make package      - Package the application"
-	@echo "make archive      - Create a release archive with current version"
+	@echo "make download-archive - Download release archive from GitHub"
+	@echo "make update-formula - Update formula with correct SHA256"
 	@echo "make release v=X.Y.Z - Create a full release with specified version"
 	@echo "make auto-release - Create a release using the current version"
 	@echo "make clean        - Clean build artifacts"
