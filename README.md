@@ -17,6 +17,18 @@ ClipHit is a simple, lightweight clipboard history manager for macOS that allows
 
 ### Via Homebrew (recommended)
 
+#### Option 1: Using brew tap (for testing)
+
+```bash
+# Tap the repository
+brew tap mohitgupta07/cliphit
+
+# Install ClipHit
+brew install cliphit
+```
+
+#### Option 2: Building from source
+
 ```bash
 # Clone the repository
 git clone https://github.com/mohitgupta07/cliphit.git
