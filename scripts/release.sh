@@ -40,6 +40,15 @@ git tag "v$NEW_VERSION"
 echo "📦 Preparing release files..."
 make archive
 
+# Ensure releases directory is tracked by git
+if [ ! -d "releases" ]; then
+  echo "Error: releases directory not found after running make archive"
+  exit 1
+fi
+
+git add releases/cliphit-${NEW_VERSION}.tar.gz
+git add cliphit.rb
+
 # Commit changes
 echo "💾 Committing changes..."
 git commit -am "Release v$NEW_VERSION"
@@ -55,7 +64,7 @@ echo ""
 echo "The following actions were performed:"
 echo "- Updated version number across all files"
 echo "- Created git tag v$NEW_VERSION"
-echo "- Generated release archive"
+echo "- Generated release archive in releases directory"
 echo "- Updated SHA256 hash in Homebrew formula"
 echo "- Committed and pushed changes"
 echo ""

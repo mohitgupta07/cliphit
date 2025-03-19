@@ -4,10 +4,17 @@
 # Get version from package.json
 VERSION := $(shell node -e "console.log(require('./package.json').version)")
 
-.PHONY: all install package archive release clean
+# Directories
+RELEASES_DIR := releases
+
+.PHONY: all install package archive release clean ensure-releases-dir
 
 # Default target
 all: install package
+
+# Create releases directory if it doesn't exist
+ensure-releases-dir:
+	@mkdir -p $(RELEASES_DIR)
 
 # Install dependencies
 install:
@@ -20,18 +27,18 @@ package:
 	yarn package
 
 # Create release archive
-archive:
+archive: ensure-releases-dir
 	@echo "📁 Creating release archive for version $(VERSION)..."
 	@if git rev-parse "v$(VERSION)" >/dev/null 2>&1; then \
 		echo "Using git tag v$(VERSION) for archive creation..."; \
-		git archive --format=tar.gz --prefix=cliphit-$(VERSION)/ -o cliphit-$(VERSION).tar.gz "v$(VERSION)"; \
+		git archive --format=tar.gz --prefix=cliphit-$(VERSION)/ -o $(RELEASES_DIR)/cliphit-$(VERSION).tar.gz "v$(VERSION)"; \
 	else \
 		echo "Git tag v$(VERSION) not found. Creating archive from current HEAD..."; \
-		git archive --format=tar.gz --prefix=cliphit-$(VERSION)/ -o cliphit-$(VERSION).tar.gz HEAD; \
+		git archive --format=tar.gz --prefix=cliphit-$(VERSION)/ -o $(RELEASES_DIR)/cliphit-$(VERSION).tar.gz HEAD; \
 	fi
 	@echo "🔑 Generating SHA256 hash..."
-	./scripts/generate-hash.sh
-	@echo "✅ Archive cliphit-$(VERSION).tar.gz created and hash updated in formula"
+	ARCHIVE_PATH="$(RELEASES_DIR)" ./scripts/generate-hash.sh
+	@echo "✅ Archive $(RELEASES_DIR)/cliphit-$(VERSION).tar.gz created and hash updated in formula"
 
 # Create a new release with specified version
 release:
@@ -51,7 +58,7 @@ auto-release:
 clean:
 	@echo "🧹 Cleaning build artifacts..."
 	rm -rf dist
-	rm -f cliphit-*.tar.gz
+	rm -f $(RELEASES_DIR)/cliphit-*.tar.gz
 
 # Show help
 help:

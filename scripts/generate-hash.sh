@@ -12,10 +12,14 @@ else
   VERSION=$(node -p "require('./package.json').version")
 fi
 
-ARCHIVE_NAME="cliphit-${VERSION}.tar.gz"
+# Check if ARCHIVE_PATH environment variable is set, default to current directory
+ARCHIVE_PATH=${ARCHIVE_PATH:-.}
+
+ARCHIVE_NAME="${ARCHIVE_PATH}/cliphit-${VERSION}.tar.gz"
 FORMULA_FILE="cliphit.rb"
 
 echo "Using version: ${VERSION}"
+echo "Archive location: ${ARCHIVE_NAME}"
 
 # Check if the archive exists
 if [ ! -f "${ARCHIVE_NAME}" ]; then
