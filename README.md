@@ -38,6 +38,81 @@ cd cliphit
 brew install --build-from-source ./cliphit.rb
 ```
 
+#### Option 3: Testing locally (without GitHub access)
+
+If you need to test the Homebrew installation process locally without access to GitHub, follow these steps:
+
+1. **Create a local formula file**
+
+Create a test formula file called `cliphit_test.rb` with the following content:
+
+```ruby
+class CliphitTest < Formula
+  desc "A clipboard history manager for macOS (test version)"
+  homepage "https://github.com/mohitgupta07/cliphit"
+  license "MIT"
+  version "1.0.1"
+  
+  # Use HEAD for local development testing
+  head do
+    url "file:///path/to/your/cliphit/directory", :branch => "main" # Replace with your path and branch
+  end
+  
+  def install
+    # Create a mock app structure for testing
+    app_dir = buildpath/"MockClipHit.app/Contents/MacOS"
+    app_dir.mkpath
+    (app_dir/"cliphit").write("#!/bin/bash\necho 'ClipHit Mock App'")
+    system "chmod", "+x", "#{app_dir}/cliphit"
+    prefix.install "MockClipHit.app"
+    
+    # Add a CLI executable
+    bin.mkpath
+    (bin/"cliphit").write("#!/bin/bash\necho 'ClipHit CLI'")
+    system "chmod", "+x", "#{bin}/cliphit"
+  end
+
+  test do
+    system "#{bin}/cliphit"
+  end
+end
+```
+
+2. **Install using the local formula**
+
+```bash
+# Install from the local formula (using HEAD to test from the current directory)
+brew install --HEAD ./cliphit_test.rb
+```
+
+3. **Test the installation**
+
+```bash
+# Run the mock CLI
+cliphit
+
+# Verify installation path
+brew --prefix cliphit_test
+```
+
+4. **Create a local tap (alternative method)**
+
+If you want to set up a complete local tap:
+
+```bash
+# Create a local tap directory structure
+mkdir -p ~/homebrew-cliphit/Formula
+
+# Copy your formula file
+cp cliphit_test.rb ~/homebrew-cliphit/Formula/cliphit.rb
+
+# Tap the local directory
+brew tap mohitgupta07/cliphit ~/homebrew-cliphit
+
+# Install from the local tap
+brew install --HEAD mohitgupta07/cliphit/cliphit
+```
+
 ### Running from Source
 
 ```bash
