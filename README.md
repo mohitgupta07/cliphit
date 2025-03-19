@@ -15,105 +15,41 @@ ClipHit is a simple, lightweight clipboard history manager for macOS that allows
 
 ## Installation
 
-### Via Homebrew (recommended)
+### Via Homebrew (Recommended)
 
-#### Option 1: Using brew tap (for testing)
+The easiest way to install ClipHit is through Homebrew:
 
 ```bash
-# Tap the repository
-brew tap mohitgupta07/cliphit
+# Tap the repository (only needed once)
+brew tap mohitgupta07/cliphit ~/homebrew-cliphit
 
 # Install ClipHit
 brew install cliphit
 ```
 
-#### Option 2: Building from source
+After installation, you can find ClipHit in your Applications folder or launch it directly from the terminal:
 
 ```bash
-# Clone the repository
-git clone https://github.com/mohitgupta07/cliphit.git
-cd cliphit
-
-# Install using Homebrew
-brew install --build-from-source ./cliphit.rb
+open -a ClipHit
 ```
 
-#### Option 3: Testing locally (without GitHub access)
-
-If you need to test the Homebrew installation process locally without access to GitHub, follow these steps:
-
-1. **Create a local formula file**
-
-Create a test formula file called `cliphit_test.rb` with the following content:
-
-```ruby
-class CliphitTest < Formula
-  desc "A clipboard history manager for macOS (test version)"
-  homepage "https://github.com/mohitgupta07/cliphit"
-  license "MIT"
-  version "1.0.1"
-  
-  # Use HEAD for local development testing
-  head do
-    url "file:///path/to/your/cliphit/directory", :branch => "main" # Replace with your path and branch
-  end
-  
-  def install
-    # Create a mock app structure for testing
-    app_dir = buildpath/"MockClipHit.app/Contents/MacOS"
-    app_dir.mkpath
-    (app_dir/"cliphit").write("#!/bin/bash\necho 'ClipHit Mock App'")
-    system "chmod", "+x", "#{app_dir}/cliphit"
-    prefix.install "MockClipHit.app"
-    
-    # Add a CLI executable
-    bin.mkpath
-    (bin/"cliphit").write("#!/bin/bash\necho 'ClipHit CLI'")
-    system "chmod", "+x", "#{bin}/cliphit"
-  end
-
-  test do
-    system "#{bin}/cliphit"
-  end
-end
-```
-
-2. **Install using the local formula**
+If the symlink to Applications wasn't created automatically (due to permission issues), you can create it manually:
 
 ```bash
-# Install from the local formula (using HEAD to test from the current directory)
-brew install --HEAD ./cliphit_test.rb
+ln -sf "$(brew --prefix)/opt/cliphit/ClipHit.app" "/Applications/ClipHit.app"
 ```
 
-3. **Test the installation**
+### Manual Installation
 
-```bash
-# Run the mock CLI
-cliphit
+If you prefer not to use Homebrew, you can manually install ClipHit:
 
-# Verify installation path
-brew --prefix cliphit_test
-```
+1. Download the latest release from the [Releases page](https://github.com/mohitgupta07/cliphit/releases)
+2. Extract the archive
+3. Drag ClipHit.app to your Applications folder
 
-4. **Create a local tap (alternative method)**
+### Building from Source
 
-If you want to set up a complete local tap:
-
-```bash
-# Create a local tap directory structure
-mkdir -p ~/homebrew-cliphit/Formula
-
-# Copy your formula file
-cp cliphit_test.rb ~/homebrew-cliphit/Formula/cliphit.rb
-
-# Tap the local directory
-brew tap mohitgupta07/cliphit ~/homebrew-cliphit
-
-# Install from the local tap
-brew install --HEAD mohitgupta07/cliphit/cliphit
-```
-
-### Running from Source
+If you want to build ClipHit from source:
 
 ```bash
 # Clone the repository
@@ -123,14 +59,10 @@ cd cliphit
 # Install dependencies
 yarn install
 
-# Start the app
+# Start the app in development mode
 yarn start
-```
 
-### Packaging the App
-
-```bash
-# Package the app for macOS
+# Or package the app for production
 yarn package
 ```
 
@@ -138,12 +70,54 @@ After packaging, you can find the app in the `dist` folder. Drag it to your Appl
 
 ## Usage
 
-1. Launch ClipHit
+1. Launch ClipHit from your Applications folder
 2. The app will run in the background with an icon in your menu bar
 3. Copy text as you normally would
 4. Press `Cmd+Shift+V` to open the clipboard history window
 5. Click on any item to paste it
 6. Use the search bar to find specific items in your history
+
+## Uninstallation
+
+To uninstall ClipHit:
+
+```bash
+# If installed via Homebrew
+brew uninstall cliphit
+
+# Remove the tap if no longer needed
+brew untap mohitgupta07/cliphit
+```
+
+## Troubleshooting
+
+### Version Mismatch
+
+If you encounter issues with version mismatches when installing via Homebrew, try:
+
+```bash
+# Update Homebrew
+brew update
+
+# Untap and retap the repository
+brew untap mohitgupta07/cliphit
+brew tap mohitgupta07/cliphit ~/homebrew-cliphit
+
+# Install ClipHit
+brew install cliphit
+```
+
+### Permission Issues
+
+If you encounter permission issues during installation, try:
+
+```bash
+# Install without creating the Applications symlink
+brew install cliphit || true
+
+# Manually create the symlink
+ln -sf "$(brew --prefix)/opt/cliphit/ClipHit.app" "/Applications/ClipHit.app"
+```
 
 ## Creating a Release
 

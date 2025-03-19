@@ -14,6 +14,17 @@ class Cliphit < Formula
     system "yarn", "install"
     system "yarn", "package"
     prefix.install "dist/ClipHit-darwin-x64/ClipHit.app"
+    
+    # Create symlink in system Applications folder automatically if user has permission
+    system "ln", "-sf", "#{prefix}/ClipHit.app", "/Applications/ClipHit.app"
+  end
+
+  def post_install
+    # In case the system command failed, remind user how to create the symlink
+    unless File.exist?("/Applications/ClipHit.app")
+      opoo "Could not create symlink in /Applications folder. You may need to run this manually:"
+      puts "  ln -sf #{prefix}/ClipHit.app /Applications/ClipHit.app"
+    end
   end
 
   def caveats
@@ -21,7 +32,8 @@ class Cliphit < Formula
       ClipHit has been installed to:
         #{prefix}/ClipHit.app
       
-      You can link it to your Applications folder:
+      A symlink has been automatically created in your Applications folder.
+      If the symlink wasn't created due to permissions, you can create it yourself with:
         ln -sf "#{prefix}/ClipHit.app" "/Applications/ClipHit.app"
     EOS
   end
