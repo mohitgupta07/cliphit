@@ -38,7 +38,7 @@ git tag "v$NEW_VERSION"
 
 # Prepare the release (create archive and generate hash)
 echo "📦 Preparing release files..."
-yarn prepare-release
+make archive
 
 # Commit changes
 echo "💾 Committing changes..."

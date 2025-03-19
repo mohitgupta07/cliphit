@@ -5,8 +5,13 @@
 
 set -e
 
-# Extract version from package.json
-VERSION=$(node -p "require('../package.json').version")
+# Extract version from package.json - use relative path based on script location
+if [ -f "../package.json" ]; then
+  VERSION=$(node -p "require('../package.json').version")
+else
+  VERSION=$(node -p "require('./package.json').version")
+fi
+
 ARCHIVE_NAME="cliphit-${VERSION}.tar.gz"
 FORMULA_FILE="cliphit.rb"
 
@@ -18,7 +23,7 @@ if [ ! -f "${ARCHIVE_NAME}" ]; then
   echo "This script should be run after creating the release archive."
   echo ""
   echo "To create an archive for release, run:"
-  echo "  yarn create-archive"
+  echo "  make archive"
   exit 1
 fi
 

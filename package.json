@@ -7,9 +7,9 @@
   "scripts": {
     "start": "electron .",
     "package": "electron-packager . ClipHit --platform=darwin --arch=x64 --out=dist --icon=assets/icon.icns --overwrite",
-    "create-archive": "git archive --format=tar.gz --prefix=cliphit-${npm_package_version}/ -o cliphit-${npm_package_version}.tar.gz v${npm_package_version}",
+    "create-archive": "git archive --format=tar.gz --prefix=cliphit-${npm_package_version}/ -o cliphit-${npm_package_version}.tar.gz HEAD",
     "generate-hash": "./scripts/generate-hash.sh",
-    "prepare-release": "npm run create-archive && npm run generate-hash",
+    "prepare-release": "make archive",
     "update-version": "./scripts/update-version.sh",
     "release": "./scripts/release.sh"
   },
