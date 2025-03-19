@@ -2,7 +2,7 @@ class CliphitTest < Formula
   desc "A clipboard history manager for macOS (test version)"
   homepage "https://github.com/mohitgupta07/cliphit"
   license "MIT"
-  version "1.0.1"
+  version "1.1.1"
   
   # Use HEAD for local development testing
   head do
