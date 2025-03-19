@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Script to automate the entire release process with a two-phase approach
-# to avoid SHA256 update paradox
+# Script to automate the first phase of the release process
+# The second phase (SHA256 updates) is now handled by GitHub Actions
 
 set -e
 
@@ -29,7 +29,7 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-# PHASE 1: Create the release without updating the formula
+# PHASE 1: Create the release (GitHub Actions will handle PHASE 2)
 echo "========== PHASE 1: Creating Release =========="
 
 # Update version numbers across the project
@@ -45,51 +45,26 @@ git commit -m "Bump version to v$NEW_VERSION"
 echo "🏷️  Creating git tag v$NEW_VERSION..."
 git tag "v$NEW_VERSION"
 
-# Push the tag (this creates the GitHub release source)
+# Push the tag (this creates the GitHub release source and triggers the Actions workflow)
 echo "🚀 Pushing tag..."
 git push origin "v$NEW_VERSION"
-
-# PHASE 2: Generate formula SHA256 from the tagged release
-echo "========== PHASE 2: Updating Formula =========="
-
-# Create releases directory if needed
-mkdir -p releases
-
-# Download the tagged archive directly from GitHub
-echo "📦 Downloading release archive from GitHub..."
-curl -L "https://github.com/mohitgupta07/cliphit/archive/refs/tags/v$NEW_VERSION.tar.gz" -o "releases/cliphit-$NEW_VERSION.tar.gz"
-
-# Generate SHA256 hash
-echo "🔑 Generating SHA256 hash..."
-HASH=$(shasum -a 256 "releases/cliphit-$NEW_VERSION.tar.gz" | cut -d ' ' -f 1)
-
-if [ -z "${HASH}" ]; then
-  echo "Error: Failed to generate hash."
-  exit 1
-fi
-
-echo "Generated SHA256 hash: ${HASH}"
-
-# Update the formula file
-echo "📝 Updating formula with new hash..."
-sed -i '' "s/sha256 \".*\"/sha256 \"${HASH}\"/g" "cliphit.rb"
-
-# Commit and push the formula update
-echo "💾 Committing formula update..."
-git add cliphit.rb
-git add releases/cliphit-${NEW_VERSION}.tar.gz
-git commit -m "Update formula for v$NEW_VERSION"
 git push origin main
 
 echo ""
-echo "✅ Release v$NEW_VERSION completed successfully!"
+echo "✅ Release v$NEW_VERSION initiated successfully!"
 echo ""
 echo "The following actions were performed:"
 echo "- Updated version number across all files"
 echo "- Created git tag v$NEW_VERSION"
-echo "- Downloaded release archive from GitHub"
-echo "- Updated SHA256 hash in Homebrew formula"
-echo "- Committed and pushed all changes"
+echo "- Pushed tag to GitHub"
 echo ""
-echo "You can now create a GitHub release at:"
+echo "GitHub Actions will now:"
+echo "- Download the release archive"
+echo "- Update the SHA256 hash in the formula"
+echo "- Commit and push the changes"
+echo ""
+echo "You can monitor the progress at:"
+echo "https://github.com/mohitgupta07/cliphit/actions"
+echo ""
+echo "Once complete, you can create a GitHub release at:"
 echo "https://github.com/mohitgupta07/cliphit/releases/new?tag=v$NEW_VERSION" 

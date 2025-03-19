@@ -157,14 +157,15 @@ The easiest way to create a release is to use the automated release script:
 yarn release X.Y.Z
 ```
 
-This single command will:
+This command will:
 1. Update version numbers across all files
 2. Create a git tag and push it to GitHub
-3. Download the release archive from GitHub
-4. Update the SHA256 hash in the Homebrew formula
-5. Commit and push formula changes
+3. Trigger a GitHub Actions workflow that will:
+   - Download the release archive from GitHub
+   - Update the SHA256 hash in the Homebrew formula
+   - Commit and push the changes automatically
 
-This two-phase approach ensures the SHA256 in the formula is always accurate.
+This automated approach ensures the SHA256 in the formula is always accurate with zero manual intervention.
 
 ### Option 2: Manual Release Process
 
@@ -173,10 +174,21 @@ If you prefer more control, you can follow these manual steps:
 1. Update the version in `package.json`
 2. Commit the change: `git commit -am "Bump version to vX.Y.Z"`
 3. Create and push a git tag: `git tag vX.Y.Z && git push origin vX.Y.Z`
-4. Download the release archive: `make download-archive`
-5. Update the formula: `make update-formula`
-6. Commit formula changes: `git commit -am "Update formula for vX.Y.Z"`
-7. Push changes: `git push origin main`
+4. The GitHub Actions workflow will automatically handle the rest
+
+## GitHub Actions Workflow
+
+This project uses GitHub Actions to automate the Homebrew formula updates:
+
+1. When a new tag is pushed, the workflow is triggered
+2. It downloads the release archive from GitHub
+3. Calculates the SHA256 hash
+4. Updates the formula with the correct hash
+5. Commits and pushes the changes
+
+You can monitor the progress of these workflows in the Actions tab of the repository.
+
+**Note**: For the GitHub Actions workflow to function properly, you need to set up a `PERSONAL_ACCESS_TOKEN` secret in your repository settings with sufficient permissions to push to the repository. See [GitHub Token Setup Documentation](docs/github-token-setup.md) for detailed instructions.
 
 ## Contributing
 
