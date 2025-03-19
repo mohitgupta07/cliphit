@@ -1,10 +1,10 @@
 class Cliphit < Formula
   desc "A clipboard history manager for macOS"
   homepage "https://github.com/mohitgupta07/cliphit"
-  url "https://github.com/mohitgupta07/cliphit/archive/refs/tags/v1.0.2.tar.gz"
+  url "https://github.com/mohitgupta07/cliphit/archive/refs/tags/v1.0.1.tar.gz"
   # The SHA256 hash should be generated when creating a release
-  # To generate: `shasum -a 256 cliphit-1.0.2.tar.gz`
-  sha256 "134115aee724fb14b9ae676bb36fdd2a6f26e9989af30a58265b0ed0f2f1c55e" # Will be replaced during release process
+  # To generate: `shasum -a 256 cliphit-1.0.1.tar.gz`
+  sha256 "134115aee724fb14b9ae676bb36fdd2a6f26e9989af30a58265b0ed0f2f1c55e"
   license "MIT"
 
   depends_on "node"
