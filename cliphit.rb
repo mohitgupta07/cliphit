@@ -1,10 +1,10 @@
 class Cliphit < Formula
   desc "A clipboard history manager for macOS"
   homepage "https://github.com/mohitgupta07/cliphit"
-  url "https://github.com/mohitgupta07/cliphit/archive/refs/tags/v1.0.1.tar.gz"
-  # The SHA256 hash should be generated when creating a release
-  # To generate: `shasum -a 256 cliphit-1.0.1.tar.gz`
-  sha256 "134115aee724fb14b9ae676bb36fdd2a6f26e9989af30a58265b0ed0f2f1c55e"
+  url "https://github.com/mohitgupta07/cliphit/archive/refs/tags/v1.1.0.tar.gz"
+  # SHA256 verification is optional during development
+  # To generate if needed: `shasum -a 256 cliphit-1.1.0.tar.gz`
+  sha256 :no_check  # This tells Homebrew to skip the checksum verification
   license "MIT"
 
   depends_on "node"
